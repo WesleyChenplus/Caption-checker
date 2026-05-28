@@ -32,34 +32,30 @@ BMP
 ## Screenshot / 程式畫面
 
 ### Main UI
+<img width="2560" height="1392" alt="image" src="https://github.com/user-attachments/assets/115b1651-2e65-44a3-bcea-24a02a404fd9" />
+
 
 ```markdown
-![image](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/main_ui.png)
+
 ```
 
 ### Translation Workflow
+<img width="2010" height="1298" alt="image" src="https://github.com/user-attachments/assets/cdf418bc-7b82-47e4-8598-b2986441c21b" />
+<img width="2559" height="1391" alt="image" src="https://github.com/user-attachments/assets/e77df46a-6c9f-4658-b0ff-5d779492cc55" />
+<img width="2556" height="1391" alt="image" src="https://github.com/user-attachments/assets/801557f6-6273-46b0-a51f-3030761f2f5d" />
+
 
 ```markdown
-![image](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/translation_ui.png)
+<img width="2559" height="1341" alt="image" src="https://github.com/user-attachments/assets/322ea0b5-8e6e-40bf-b45e-7d587269018f" />
+
 ```
 
 ### Search & Replace
 
 ```markdown
-![image](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/search_replace.png)
-```
+<img width="2559" height="1141" alt="image" src="https://github.com/user-attachments/assets/2383e14a-a0bf-4142-a508-8c0f9bb89bd7" />
 
-> Put your screenshots inside:
->
-> ```text
-> /screenshots/
-> ```
->
-> 請將畫面截圖放入：
->
-> ```text
-> /screenshots/
-> ```
+```
 
 ---
 
@@ -75,14 +71,17 @@ git clone https://github.com/WesleyChenplus/Caption-checker.git
 
 ### Install Dependencies
 
+執行venv.bat 或
+
 ```bash
-pip install pillow deep-translator
+pip install -r requirements.txt
 ```
 
 ---
 
 ### Run
 
+執行run.bat或
 ```bash
 python dataset_tagger.py
 ```
@@ -189,15 +188,15 @@ Supports:
 
 ## Hotkeys / 快捷鍵
 
-| Shortcut       | Function              |
-| -------------- | --------------------- |
-| Ctrl + S       | Save                  |
-| Ctrl + T       | Translate             |
-| Alt + T        | Reverse Translate     |
-| Ctrl + F       | Find / Replace        |
-| Ctrl + Alt + F | Search File           |
-| Alt + ↑ / ↓    | Previous / Next Image |
-| Ctrl + H       | Toggle File List      |
+| Shortcut       | Function                      |
+| -------------- | ----------------------------- |
+| Ctrl + S       | 存檔 Save                      |
+| Ctrl + T       | 順向翻譯 Translate             |
+| Alt + T        | 逆向翻譯 Reverse Translate     |
+| Ctrl + F       | 尋找 / 取代內文Find / Replace  |
+| Ctrl + Alt + F | 搜尋檔案 Search File           |
+| Alt + ↑ / ↓    | 前一張圖片 Previous / Next Image |
+| Ctrl + H       | 下一張圖片 Toggle File List      |
 
 ---
 
