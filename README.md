@@ -34,19 +34,19 @@ BMP
 ### Main UI
 
 ```markdown
-![Main UI](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/main_ui.png)
+![image](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/main_ui.png)
 ```
 
 ### Translation Workflow
 
 ```markdown
-![Translation](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/translation_ui.png)
+![image](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/translation_ui.png)
 ```
 
 ### Search & Replace
 
 ```markdown
-![Search](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/search_replace.png)
+![image](https://raw.githubusercontent.com/WesleyChenplus/Caption-checker/main/screenshots/search_replace.png)
 ```
 
 > Put your screenshots inside:
