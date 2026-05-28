@@ -69,7 +69,7 @@ git clone https://github.com/WesleyChenplus/Caption-checker.git
 
 ---
 
-### Install Dependencies
+### Install Dependencies / 安裝依賴環境
 
 執行venv.bat 或
 
@@ -92,17 +92,11 @@ python dataset_tagger.py
 
 ### Dataset Caption Editing / Dataset 標籤編輯
 
-* Edit captions directly
+* Edit captions directly / 直接編輯caption
 
-* Original caption protection
+* Original caption protection / 原始caption內容保護
 
-* Translation preview panel
-
-* 直接編輯 Caption
-
-* 原始內容唯讀保護
-
-* 翻譯預覽區
+* Translation preview panel / 翻譯預覽區
 
 ---
 
@@ -111,12 +105,10 @@ python dataset_tagger.py
 Supports:
 
 * Google Translator
-* MyMemory Translator
 
 支援：
 
 * Google 翻譯
-* MyMemory 翻譯
 
 ---
 
