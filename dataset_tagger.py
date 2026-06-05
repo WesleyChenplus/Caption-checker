@@ -294,7 +294,20 @@ class DatasetTaggerApp:
         self.metadata = {}
         self.sort_col = "time"
         self.sort_reverse = True
-        self.lang_map = {"Auto": "auto", "English": "en", "繁體中文": "zh-TW", "简体中文": "zh-CN"}
+        
+        # 擴充為支援多國主流語系的對照表
+        self.lang_map = {
+            "Auto": "auto", 
+            "English": "en", 
+            "繁體中文": "zh-TW", 
+            "简体中文": "zh-CN",
+            "日本語": "ja",
+            "한국어": "ko",
+            "Español": "es",
+            "Français": "fr",
+            "Deutsch": "de",
+            "Русский": "ru"
+        }
 
         self.ui_elements_registry = []
         self.tree_menu_indices = {
@@ -468,14 +481,15 @@ class DatasetTaggerApp:
         self.combo_engine.set("Google")
         self.combo_engine.pack(side=tk.LEFT, padx=5)
 
-        self.combo_src = ttk.Combobox(fbl, values=list(self.lang_map.keys()), width=10, state="readonly")
+        # 加寬度至 12 以配合多國語言名稱
+        self.combo_src = ttk.Combobox(fbl, values=list(self.lang_map.keys()), width=12, state="readonly")
         self.combo_src.set("Auto")
         self.combo_src.pack(side=tk.LEFT, padx=2)
 
         self.btn_swap = self._create_btn(fbl, "swap", self.swap_languages)
 
         tgt_def = "English" if self.current_lang == "English" else self.current_lang
-        self.combo_tgt = ttk.Combobox(fbl, values=list(self.lang_map.keys())[1:], width=10, state="readonly")
+        self.combo_tgt = ttk.Combobox(fbl, values=list(self.lang_map.keys())[1:], width=12, state="readonly")
         self.combo_tgt.set(tgt_def)
         self.combo_tgt.pack(side=tk.LEFT, padx=2)
 
@@ -1082,16 +1096,16 @@ class DatasetTaggerApp:
         return "break"
 
     def move_files(self, event=None):
-        if hasattr(self, 'mv_window') and self.mv_window and self.mv_window.winfo_exists():
-            self.mv_window.destroy()
-            self.mv_window = None
+        if hasattr(self, 'move_files_window') and self.move_files_window and self.move_files_window.winfo_exists():
+            self.move_files_window.destroy()
+            self.move_files_window = None
             return "break"
 
         selected = self.tree.selection()
         if not selected: return "break"
         cfg = self.i18n[self.current_lang]
 
-        self.mv_window = win = tk.Toplevel(self.root)
+        self.move_files_window = win = tk.Toplevel(self.root)
         win.title(cfg["menu_move"])
         win.geometry("450x120")
         win.attributes("-topmost", True)
@@ -1127,7 +1141,7 @@ class DatasetTaggerApp:
             self.save_app_config()
 
             win.destroy()
-            self.mv_window = None
+            self.move_files_window = None
             self.load_directory(self.current_dir)
 
         def browse():
@@ -1139,7 +1153,7 @@ class DatasetTaggerApp:
         btn_f.pack(pady=5)
         tk.Button(btn_f, text=cfg["pm_browse"], command=browse).pack(side=tk.LEFT, padx=5)
         tk.Button(btn_f, text=cfg["pm_move"], command=do_move, bg="#ffcccc").pack(side=tk.LEFT, padx=5)
-        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'mv_window', None)))
+        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'move_files_window', None)))
         return "break"
 
     def rename_file(self, event=None):
@@ -1168,13 +1182,13 @@ class DatasetTaggerApp:
         return "break"
 
     def open_group_manager(self, event=None):
-        if hasattr(self, 'grp_window') and self.grp_window and self.grp_window.winfo_exists():
-            self.grp_window.destroy()
-            self.grp_window = None
+        if hasattr(self, 'group_manager_window') and self.group_manager_window and self.group_manager_window.winfo_exists():
+            self.group_manager_window.destroy()
+            self.group_manager_window = None
             return "break"
 
         cfg = self.i18n[self.current_lang]
-        self.grp_window = win = tk.Toplevel(self.root)
+        self.group_manager_window = win = tk.Toplevel(self.root)
         win.title(cfg["dlg_grp_mgr"])
         win.geometry("480x350")
         win.attributes("-topmost", True)
@@ -1281,17 +1295,17 @@ class DatasetTaggerApp:
         tk.Button(btn_f, text=cfg.get("btn_apply_grp", "Apply w/ Tags"), command=lambda: apply_grp(False), bg="#ccffcc").pack(side=tk.RIGHT, padx=5)
         tk.Button(btn_f, text=cfg.get("btn_apply_grp_only", "Apply Group Only"), command=lambda: apply_grp(True)).pack(side=tk.RIGHT, padx=5)
 
-        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'grp_window', None)))
+        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'group_manager_window', None)))
         return "break"
 
     def open_prompt_manager(self, event=None):
-        if hasattr(self, 'pm_window') and self.pm_window and self.pm_window.winfo_exists():
-            self.pm_window.destroy()
-            self.pm_window = None
+        if hasattr(self, 'prompt_manager_window') and self.prompt_manager_window and self.prompt_manager_window.winfo_exists():
+            self.prompt_manager_window.destroy()
+            self.prompt_manager_window = None
             return "break"
 
         cfg = self.i18n[self.current_lang]
-        self.pm_window = win = tk.Toplevel(self.root)
+        self.prompt_manager_window = win = tk.Toplevel(self.root)
         win.title(cfg["menu_prompt_mgr"])
         win.geometry("550x450")
 
@@ -1352,9 +1366,9 @@ class DatasetTaggerApp:
             self.text_edit.insert("1.0", new_text)
             self.show_toast(cfg["toast_applied"], bg_color="#4CAF50")
             win.destroy()
-            self.pm_window = None
+            self.prompt_manager_window = None
 
-        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'pm_window', None)))
+        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'prompt_manager_window', None)))
 
         f_bot = tk.Frame(win)
         f_bot.pack(fill=tk.X, padx=5, pady=5)
@@ -1379,13 +1393,13 @@ class DatasetTaggerApp:
                 subprocess.Popen(['xdg-open', self.current_dir])
 
     def open_search_file(self, event=None):
-        if hasattr(self, 'fs_window') and self.fs_window and self.fs_window.winfo_exists():
-            self.fs_window.destroy()
-            self.fs_window = None
+        if hasattr(self, 'filter_search_window') and self.filter_search_window and self.filter_search_window.winfo_exists():
+            self.filter_search_window.destroy()
+            self.filter_search_window = None
             return "break"
 
         cfg = self.i18n[self.current_lang]
-        self.fs_window = win = tk.Toplevel(self.root)
+        self.filter_search_window = win = tk.Toplevel(self.root)
         win.title(cfg["search_file"])
         win.attributes("-topmost", True)
         win.geometry("380x150")
@@ -1411,7 +1425,7 @@ class DatasetTaggerApp:
         tk.Button(btn_f, text=cfg["btn_filter"], command=self.apply_filter, bg="#d9edf7").pack(side=tk.LEFT, padx=5)
         tk.Button(btn_f, text=cfg["btn_clear_filter"], command=self.clear_filter).pack(side=tk.LEFT, padx=5)
 
-        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'fs_window', None)))
+        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'filter_search_window', None)))
 
         win.update_idletasks()
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - (win.winfo_width() // 2)
@@ -1768,6 +1782,10 @@ class DatasetTaggerApp:
         return "break"
 
     def show_hotkeys(self, event=None):
+        if hasattr(self, 'search_replace_window') and self.search_replace_window and self.search_replace_window.winfo_exists():
+            self.search_replace_window.destroy()
+            self.search_replace_window = None
+
         if hasattr(self, 'hk_window') and self.hk_window and self.hk_window.winfo_exists():
             self.hk_window.destroy()
             self.hk_window = None
@@ -1791,6 +1809,10 @@ class DatasetTaggerApp:
         return "break"
 
     def open_search_replace(self, event=None):
+        if hasattr(self, 'hk_window') and self.hk_window and self.hk_window.winfo_exists():
+            self.hk_window.destroy()
+            self.hk_window = None
+
         if hasattr(self, 'sr_window') and self.sr_window and self.sr_window.winfo_exists():
             self.sr_window.destroy()
             self.sr_window = None
