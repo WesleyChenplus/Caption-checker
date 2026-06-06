@@ -72,6 +72,8 @@ class DatasetTaggerApp:
             "Ctrl + F : 顯示/關閉 搜尋內文\n"
             "Alt + L : 跳至最後編輯的檔案\n"
             "Alt + ↑ / ↓ : 上/下一張圖片\n"
+            "滑鼠滾輪 : 以游標為中心縮放圖片\n"
+            "滑鼠左鍵拖曳 : 平移圖片 | 滑鼠中鍵 : 重設圖片縮放\n"
             "滑鼠雙擊圖片 : 定位並置中顯示列表檔案\n"
             "Ctrl + Alt + +/-/* : 文字視窗字體縮放/重設\n\n"
             "【列表專屬熱鍵 (需點擊左側列表)】\n"
@@ -98,6 +100,8 @@ class DatasetTaggerApp:
             "Ctrl + F : 显示/关闭 搜索内文\n"
             "Alt + L : 跳至最后编辑的文件\n"
             "Alt + ↑ / ↓ : 上/下一张图片\n"
+            "鼠标滚轮 : 以光标为中心缩放图片\n"
+            "鼠标左键拖曳 : 平移图片 | 鼠标中键 : 重置图片缩放\n"
             "鼠标双击图片 : 定位并居中显示列表文件\n"
             "Ctrl + Alt + +/-/* : 文字窗口字体缩放/重置\n\n"
             "【列表专属快捷键 (需点击左侧列表)】\n"
@@ -124,6 +128,8 @@ class DatasetTaggerApp:
             "Ctrl + F : Toggle Find/Replace\n"
             "Alt + L : Jump to last edited file\n"
             "Alt + ↑ / ↓ : Previous/Next Image\n"
+            "Mouse Wheel : Zoom image centered on cursor\n"
+            "Left Click Drag : Pan Image | Middle Click : Reset Zoom\n"
             "Double Click Image : Locate and Center in List\n"
             "Ctrl + Alt + +/-/* : Zoom In/Out/Reset Font Size\n\n"
             "[List-Only Hotkeys]\n"
@@ -140,7 +146,7 @@ class DatasetTaggerApp:
         self.i18n = {
             "繁體中文": {
                 "title": "專業資料集標記與翻譯工具", "open": "開啟(Alt+O)", "show_unmarked": "顯示無標記", "hide_completed": "隱藏已完成",
-                "hide_reviewed": "隱藏不需修改", "auto_refresh": "自動更新", "show_stats": "顯示統計", "enable_filter": "啟用篩選",
+                "hide_reviewed": "隱藏不需修改", "auto_refresh": "自動更新", "auto_trans": "自動載入翻譯", "show_stats": "顯示統計", "enable_filter": "啟用篩選",
                 "save": "儲存(Ctrl+S)", "trans": "翻譯(Ctrl+T)", "overwrite": "直接覆寫", "rev_trans": "反向翻譯(Alt+T)",
                 "lang": "語言:", "api": "API Key:", "toggle_list": "列表(Ctrl+H)", "view_thumb": "縮圖模式", "view_list": "列表模式",
                 "thumb_cfg": "縮圖設定", "search_file": "搜尋檔案", "search_text": "搜尋內文", "hotkey": "熱鍵(F1)", "swap": "互換",
@@ -170,7 +176,7 @@ class DatasetTaggerApp:
             },
             "简体中文": {
                 "title": "专业数据集标记与翻译工具", "open": "打开(Alt+O)", "show_unmarked": "显示无标记", "hide_completed": "隐藏已完成",
-                "hide_reviewed": "隐藏不需修改", "auto_refresh": "自动更新", "show_stats": "显示统计", "enable_filter": "启用筛选",
+                "hide_reviewed": "隐藏不需修改", "auto_refresh": "自动更新", "auto_trans": "自动载入翻译", "show_stats": "显示统计", "enable_filter": "启用筛选",
                 "save": "保存(Ctrl+S)", "trans": "翻译(Ctrl+T)", "overwrite": "直接覆盖", "rev_trans": "反向翻译(Alt+T)",
                 "lang": "语言:", "api": "API Key:", "toggle_list": "列表(Ctrl+H)", "view_thumb": "缩略图模式", "view_list": "列表模式",
                 "thumb_cfg": "缩略图设置", "search_file": "搜索文件", "search_text": "搜索内文", "hotkey": "快捷键(F1)", "swap": "互换",
@@ -200,7 +206,7 @@ class DatasetTaggerApp:
             },
             "English": {
                 "title": "Dataset Tagger & Translator", "open": "Open(Alt+O)", "show_unmarked": "Unmarked", "hide_completed": "Hide Done",
-                "hide_reviewed": "Hide Rev", "auto_refresh": "Auto-Ref", "show_stats": "Stats", "enable_filter": "Filter",
+                "hide_reviewed": "Hide Rev", "auto_refresh": "Auto-Ref", "auto_trans": "Auto Translate", "show_stats": "Stats", "enable_filter": "Filter",
                 "save": "Save(Ctrl+S)", "trans": "Translate(Ctrl+T)", "overwrite": "Overwrite", "rev_trans": "Rev Trans(Alt+T)",
                 "lang": "Lang:", "api": "API Key:", "toggle_list": "List(Ctrl+H)", "view_thumb": "Thumb Mode", "view_list": "List Mode",
                 "thumb_cfg": "Thumb Cfg", "search_file": "Search Files", "search_text": "Find in Text", "hotkey": "Hotkeys(F1)", "swap": "Swap",
@@ -258,6 +264,7 @@ class DatasetTaggerApp:
         self.var_hide_completed = tk.BooleanVar(value=False)
         self.var_hide_reviewed = tk.BooleanVar(value=False)
         self.var_auto_refresh = tk.BooleanVar(value=False)
+        self.var_auto_trans = tk.BooleanVar(value=False)
         self.var_show_stats = tk.BooleanVar(value=True)
         self.var_enable_filter = tk.BooleanVar(value=False)
         self.var_view_mode = tk.StringVar(value="list")
@@ -295,7 +302,6 @@ class DatasetTaggerApp:
         self.sort_col = "time"
         self.sort_reverse = True
         
-        # 擴充為支援多國主流語系的對照表
         self.lang_map = {
             "Auto": "auto", 
             "English": "en", 
@@ -317,6 +323,18 @@ class DatasetTaggerApp:
             11: "menu_delete", 13: "menu_explorer", 15: "copy_tags", 16: "paste_tags"
         }
 
+        # 狀態控制：判定是否為系統自動跳下一張圖
+        self.auto_translate_pending = False
+        
+        # 畫布影像引擎變數
+        self.current_pil_image = None
+        self.img_scale = 1.0
+        self.base_scale = 1.0
+        self.img_offset_x = 0.0
+        self.img_offset_y = 0.0
+        self.pan_start_x = 0
+        self.pan_start_y = 0
+
         self._create_placeholder_image()
         self.setup_ui()
         self.bind_shortcuts()
@@ -328,7 +346,6 @@ class DatasetTaggerApp:
         self.process_thumb_tasks()
 
     def _create_placeholder_image(self):
-        """建立內存中的佔位圖 (Generating... / 縮圖生成中)"""
         self.placeholder_img = Image.new('RGB', (100, 100), color='#2d3436')
         draw = ImageDraw.Draw(self.placeholder_img)
         
@@ -440,72 +457,75 @@ class DatasetTaggerApp:
     def setup_ui(self):
         tb = tk.Frame(self.root, bg="#f0f0f0")
         tb.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
-        ftl = tk.Frame(tb, bg="#f0f0f0")
-        ftr = tk.Frame(tb, bg="#f0f0f0")
-        ftl.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        ftr.pack(side=tk.RIGHT)
+        f_top_left = tk.Frame(tb, bg="#f0f0f0")
+        f_top_right = tk.Frame(tb, bg="#f0f0f0")
+        f_top_left.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        f_top_right.pack(side=tk.RIGHT)
 
-        self.btn_open = self._create_btn(ftl, "open", lambda: self.ask_directory(), padx=3)
-        self.chk_unmarked = self._create_chk(ftl, "show_unmarked", self.var_show_unmarked, self.refresh_listbox)
-        self.chk_hide_completed = self._create_chk(ftl, "hide_completed", self.var_hide_completed, self.refresh_listbox)
-        self.chk_hide_reviewed = self._create_chk(ftl, "hide_reviewed", self.var_hide_reviewed, self.refresh_listbox)
-        self.chk_auto_refresh = self._create_chk(ftl, "auto_refresh", self.var_auto_refresh)
-        self.chk_show_stats = self._create_chk(ftl, "show_stats", self.var_show_stats, self.refresh_listbox, padx=4)
+        self.btn_open = self._create_btn(f_top_left, "open", lambda: self.ask_directory(), padx=3)
+        self.chk_unmarked = self._create_chk(f_top_left, "show_unmarked", self.var_show_unmarked, self.refresh_listbox)
+        self.chk_hide_completed = self._create_chk(f_top_left, "hide_completed", self.var_hide_completed, self.refresh_listbox)
+        self.chk_hide_reviewed = self._create_chk(f_top_left, "hide_reviewed", self.var_hide_reviewed, self.refresh_listbox)
+        self.chk_auto_refresh = self._create_chk(f_top_left, "auto_refresh", self.var_auto_refresh)
+        
+        # 新增的自動翻譯核取方塊
+        self.chk_auto_trans = self._create_chk(f_top_left, "auto_trans", self.var_auto_trans)
+        
+        self.chk_show_stats = self._create_chk(f_top_left, "show_stats", self.var_show_stats, self.refresh_listbox, padx=4)
 
-        self.combo_ui = ttk.Combobox(ftr, values=["繁體中文", "简体中文", "English"], width=10, state="readonly")
+        self.combo_ui = ttk.Combobox(f_top_right, values=["繁體中文", "简体中文", "English"], width=10, state="readonly")
         self.combo_ui.set(self.current_lang)
         self.combo_ui.bind("<<ComboboxSelected>>", self.change_ui_lang)
         self.combo_ui.pack(side=tk.RIGHT, padx=5)
 
-        self.lbl_ui_lang = self._create_lbl(ftr, "lang", tk.RIGHT, bg="#f0f0f0")
-        self.entry_api = ttk.Entry(ftr, width=15)
+        self.lbl_ui_lang = self._create_lbl(f_top_right, "lang", tk.RIGHT, bg="#f0f0f0")
+        self.entry_api = ttk.Entry(f_top_right, width=15)
         self.entry_api.pack(side=tk.RIGHT, padx=10)
-        self.lbl_api = self._create_lbl(ftr, "api", tk.RIGHT, bg="#f0f0f0")
+        self.lbl_api = self._create_lbl(f_top_right, "api", tk.RIGHT, bg="#f0f0f0")
 
         bb = tk.Frame(self.root, bg="#ddd")
         bb.pack(side=tk.BOTTOM, fill=tk.X)
-        fbl = tk.Frame(bb, bg="#ddd")
-        fbr = tk.Frame(bb, bg="#ddd")
-        fbl.pack(side=tk.LEFT, fill=tk.X, expand=True)
-        fbr.pack(side=tk.RIGHT)
+        f_bot_left = tk.Frame(bb, bg="#ddd")
+        f_bot_right = tk.Frame(bb, bg="#ddd")
+        f_bot_left.pack(side=tk.LEFT, fill=tk.X, expand=True)
+        f_bot_right.pack(side=tk.RIGHT)
 
-        self.btn_toggle_list = self._create_btn(fbl, "toggle_list", self.toggle_list_panel, padx=5, pady=5)
-        self.btn_view_mode = self._create_btn(fbl, "view_thumb" if self.var_view_mode.get()=="list" else "view_list", self.toggle_view_mode)
-        self.btn_thumb_cfg = self._create_btn(fbl, "thumb_cfg", self.open_thumb_cfg)
-        self.btn_search_file = self._create_btn(fbl, "search_file", self.open_search_file, padx=5)
-        self.chk_enable_filter = self._create_chk(fbl, "enable_filter", self.var_enable_filter, self.refresh_listbox, state=tk.DISABLED)
-        self.btn_search_text = self._create_btn(fbl, "search_text", self.open_search_replace)
-        self.btn_save = self._create_btn(fbl, "save", self.save_tags, padx=15, bg="#dff0d8")
+        self.btn_toggle_list = self._create_btn(f_bot_left, "toggle_list", self.toggle_list_panel, padx=5, pady=5)
+        self.btn_view_mode = self._create_btn(f_bot_left, "view_thumb" if self.var_view_mode.get()=="list" else "view_list", self.toggle_view_mode)
+        self.btn_thumb_cfg = self._create_btn(f_bot_left, "thumb_cfg", self.open_thumb_cfg)
+        self.btn_search_file = self._create_btn(f_bot_left, "search_file", self.open_search_file, padx=5)
+        self.chk_enable_filter = self._create_chk(f_bot_left, "enable_filter", self.var_enable_filter, self.refresh_listbox, state=tk.DISABLED)
+        self.btn_search_text = self._create_btn(f_bot_left, "search_text", self.open_search_replace)
+        self.btn_save = self._create_btn(f_bot_left, "save", self.save_tags, padx=15, bg="#dff0d8")
 
-        self.combo_engine = ttk.Combobox(fbl, values=["Google", "DeepL (API)"], width=12, state="readonly")
+        self.combo_engine = ttk.Combobox(f_bot_left, values=["Google", "DeepL (API)"], width=12, state="readonly")
         self.combo_engine.set("Google")
         self.combo_engine.pack(side=tk.LEFT, padx=5)
 
-        # 加寬度至 12 以配合多國語言名稱
-        self.combo_src = ttk.Combobox(fbl, values=list(self.lang_map.keys()), width=12, state="readonly")
+        self.combo_src = ttk.Combobox(f_bot_left, values=list(self.lang_map.keys()), width=12, state="readonly")
         self.combo_src.set("Auto")
         self.combo_src.pack(side=tk.LEFT, padx=2)
 
-        self.btn_swap = self._create_btn(fbl, "swap", self.swap_languages)
+        self.btn_swap = self._create_btn(f_bot_left, "swap", self.swap_languages)
 
         tgt_def = "English" if self.current_lang == "English" else self.current_lang
-        self.combo_tgt = ttk.Combobox(fbl, values=list(self.lang_map.keys())[1:], width=12, state="readonly")
+        self.combo_tgt = ttk.Combobox(f_bot_left, values=list(self.lang_map.keys())[1:], width=12, state="readonly")
         self.combo_tgt.set(tgt_def)
         self.combo_tgt.pack(side=tk.LEFT, padx=2)
 
-        self.btn_trans = self._create_btn(fbl, "trans", lambda: self.translate_text(False), padx=8, bg="#d9edf7")
-        self.btn_rev_trans = self._create_btn(fbl, "rev_trans", lambda: self.translate_text(True), padx=5, bg="#ffe0b2")
-        self.btn_overwrite = self._create_btn(fbl, "overwrite", self.overwrite_edit_area)
+        self.btn_trans = self._create_btn(f_bot_left, "trans", lambda: self.translate_text(False), padx=8, bg="#d9edf7")
+        self.btn_rev_trans = self._create_btn(f_bot_left, "rev_trans", lambda: self.translate_text(True), padx=5, bg="#ffe0b2")
+        self.btn_overwrite = self._create_btn(f_bot_left, "overwrite", self.overwrite_edit_area)
 
-        ff = tk.Frame(fbl, bg="#ddd")
+        ff = tk.Frame(f_bot_left, bg="#ddd")
         ff.pack(side=tk.LEFT, padx=10)
         tk.Button(ff, text="A+", command=lambda: self.change_font_size(1)).pack(side=tk.LEFT, padx=1)
         tk.Button(ff, text="A-", command=lambda: self.change_font_size(-1)).pack(side=tk.LEFT, padx=1)
         tk.Button(ff, text="Rst", command=lambda: self.change_font_size(reset=True)).pack(side=tk.LEFT, padx=1)
 
-        self.btn_hotkey = self._create_btn(fbr, "hotkey", self.show_hotkeys, tk.RIGHT, padx=10, bg="#e0e0e0")
+        self.btn_hotkey = self._create_btn(f_bot_right, "hotkey", self.show_hotkeys, tk.RIGHT, padx=10, bg="#e0e0e0")
 
-        self.lbl_stats = tk.Label(fbr, fg="#555", bg="#ddd", font=("TkDefaultFont", 10, "bold"))
+        self.lbl_stats = tk.Label(f_bot_right, fg="#555", bg="#ddd", font=("TkDefaultFont", 10, "bold"))
         self.lbl_stats.pack(side=tk.RIGHT, padx=10)
 
         self.paned = tk.PanedWindow(self.root, orient=tk.HORIZONTAL, sashwidth=8, bg="#999")
@@ -583,10 +603,21 @@ class DatasetTaggerApp:
 
         self.lbl_filename = tk.Label(self.f_image_container, bg="#2d3436", fg="#f1c40f", font=("TkDefaultFont", 11, "bold"), pady=4)
         self.lbl_filename.pack(side=tk.TOP, fill=tk.X)
-        self.lbl_image = tk.Label(self.f_image_container, text="Preview", bg="black", fg="white")
-        self.lbl_image.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        self.lbl_image.bind("<Double-1>", self.sync_list_to_image)
+        
+        # 將原本的 Label 替換為 Canvas，以支援拖曳與游標中心縮放
+        self.canvas_image = tk.Canvas(self.f_image_container, bg="black", highlightthickness=0)
+        self.canvas_image.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        
+        self.canvas_image.bind("<Double-1>", self.sync_list_to_image)
         self.lbl_filename.bind("<Double-1>", self.sync_list_to_image)
+        
+        # 綁定畫布縮放與平移熱鍵
+        self.canvas_image.bind("<MouseWheel>", self.on_mouse_wheel)
+        self.canvas_image.bind("<Button-4>", self.on_mouse_wheel)
+        self.canvas_image.bind("<Button-5>", self.on_mouse_wheel)
+        self.canvas_image.bind("<Button-2>", self.reset_image_view)
+        self.canvas_image.bind("<ButtonPress-1>", self.on_pan_start)
+        self.canvas_image.bind("<B1-Motion>", self.on_pan_drag)
 
         self.f_orig_wrapper = tk.Frame(self.f_right)
         self.f_orig_wrapper.grid(row=0, column=1, sticky="nsew", padx=2, pady=2)
@@ -623,13 +654,8 @@ class DatasetTaggerApp:
                 element.config(text=cfg.get(key, ""))
 
         self.btn_view_mode.config(text=cfg["view_thumb"] if self.var_view_mode.get() == "list" else cfg["view_list"])
-        
-        if hasattr(self, 'tt_search_file') and self.tt_search_file:
-            self.tt_search_file.text = cfg.get("tip_search_file", "")
-        if hasattr(self, 'tt_search_text') and self.tt_search_text:
-            self.tt_search_text.text = cfg.get("tip_search_text", "")
 
-        for win_ref in ['filter_search_window', 'search_replace_window', 'group_manager_window', 'prompt_manager_window', 'thumb_config_window', 'hotkey_window', 'move_files_window']:
+        for win_ref in ['fs_window', 'sr_window', 'grp_window', 'pm_window', 'tc_window', 'hk_window', 'mv_window']:
             w = getattr(self, win_ref, None)
             if w and w.winfo_exists():
                 w.destroy()
@@ -648,6 +674,111 @@ class DatasetTaggerApp:
             if i != -1:
                 self.lbl_filename.config(text=f"{cfg['lbl_file_prefix']} [{i+1}] {self.current_filename} ")
         self.refresh_listbox()
+
+    # == 畫布操作邏輯 (縮放與平移) ==
+    def on_pan_start(self, event):
+        self.pan_start_x = event.x
+        self.pan_start_y = event.y
+
+    def on_pan_drag(self, event):
+        if not self.current_pil_image: return
+        dx = event.x - self.pan_start_x
+        dy = event.y - self.pan_start_y
+        self.img_offset_x += dx
+        self.img_offset_y += dy
+        self.pan_start_x = event.x
+        self.pan_start_y = event.y
+        self.redraw_image()
+
+    def on_mouse_wheel(self, event):
+        if not self.current_pil_image: return
+        
+        zoom_in = False
+        if hasattr(event, 'delta') and event.delta != 0:
+            zoom_in = event.delta > 0
+        elif hasattr(event, 'num'):
+            zoom_in = (event.num == 4)
+            
+        factor = 1.15 if zoom_in else (1 / 1.15)
+        new_scale = self.img_scale * factor
+        
+        if new_scale < self.base_scale * 0.2:
+            new_scale = self.base_scale * 0.2
+        if new_scale > self.base_scale * 20:
+            new_scale = self.base_scale * 20
+            
+        effective_factor = new_scale / self.img_scale
+        
+        # 確保以滑鼠游標為中心進行縮放計算
+        dx = event.x - self.img_offset_x
+        dy = event.y - self.img_offset_y
+        
+        self.img_offset_x = event.x - dx * effective_factor
+        self.img_offset_y = event.y - dy * effective_factor
+        self.img_scale = new_scale
+        
+        self.redraw_image()
+
+    def reset_image_view(self, event=None):
+        if not self.current_pil_image: return
+        
+        self.canvas_image.update_idletasks()
+        cw = self.canvas_image.winfo_width()
+        ch = self.canvas_image.winfo_height()
+        if cw < 10: cw, ch = 700, 700
+        
+        iw, ih = self.current_pil_image.size
+        self.base_scale = min(cw / iw, ch / ih)
+        self.img_scale = self.base_scale
+        self.img_offset_x = cw / 2
+        self.img_offset_y = ch / 2
+        
+        self.redraw_image()
+
+    def redraw_image(self):
+        if not self.current_pil_image: return
+        
+        iw, ih = self.current_pil_image.size
+        new_w = int(iw * self.img_scale)
+        new_h = int(ih * self.img_scale)
+        
+        cw = self.canvas_image.winfo_width()
+        ch = self.canvas_image.winfo_height()
+        if cw < 10: cw, ch = 700, 700
+        
+        img_tl_x = self.img_offset_x - new_w / 2
+        img_tl_y = self.img_offset_y - new_h / 2
+        
+        # 如果縮放倍率不大，直接對全圖 Resize 會更有效率
+        if new_w <= cw * 2.0 and new_h <= ch * 2.0:
+            resized = self.current_pil_image.resize((new_w, new_h), Image.BILINEAR)
+            self.display_photo = ImageTk.PhotoImage(resized)
+            self.canvas_image.delete("all")
+            self.canvas_image.create_image(self.img_offset_x, self.img_offset_y, image=self.display_photo)
+        else:
+            # 放大倍率極高時，只裁切畫面上的區域再做 Resize 避免記憶體爆炸
+            crop_x0 = -img_tl_x
+            crop_y0 = -img_tl_y
+            crop_x1 = crop_x0 + cw
+            crop_y1 = crop_y0 + ch
+            
+            orig_x0 = max(0, crop_x0 / self.img_scale)
+            orig_y0 = max(0, crop_y0 / self.img_scale)
+            orig_x1 = min(iw, crop_x1 / self.img_scale)
+            orig_y1 = min(ih, crop_y1 / self.img_scale)
+            
+            if orig_x0 < orig_x1 and orig_y0 < orig_y1:
+                crop_img = self.current_pil_image.crop((int(orig_x0), int(orig_y0), int(orig_x1), int(orig_y1)))
+                target_w = int((orig_x1 - orig_x0) * self.img_scale)
+                target_h = int((orig_y1 - orig_y0) * self.img_scale)
+                if target_w > 0 and target_h > 0:
+                    resized = crop_img.resize((target_w, target_h), Image.BILINEAR)
+                    self.display_photo = ImageTk.PhotoImage(resized)
+                    
+                    draw_x = img_tl_x + int(orig_x0) * self.img_scale
+                    draw_y = img_tl_y + int(orig_y0) * self.img_scale
+                    self.canvas_image.delete("all")
+                    self.canvas_image.create_image(draw_x, draw_y, anchor=tk.NW, image=self.display_photo)
 
     def on_tree_motion(self, event):
         item = self.tree.identify_row(event.y)
@@ -1096,16 +1227,16 @@ class DatasetTaggerApp:
         return "break"
 
     def move_files(self, event=None):
-        if hasattr(self, 'move_files_window') and self.move_files_window and self.move_files_window.winfo_exists():
-            self.move_files_window.destroy()
-            self.move_files_window = None
+        if hasattr(self, 'mv_window') and self.mv_window and self.mv_window.winfo_exists():
+            self.mv_window.destroy()
+            self.mv_window = None
             return "break"
 
         selected = self.tree.selection()
         if not selected: return "break"
         cfg = self.i18n[self.current_lang]
 
-        self.move_files_window = win = tk.Toplevel(self.root)
+        self.mv_window = win = tk.Toplevel(self.root)
         win.title(cfg["menu_move"])
         win.geometry("450x120")
         win.attributes("-topmost", True)
@@ -1141,7 +1272,7 @@ class DatasetTaggerApp:
             self.save_app_config()
 
             win.destroy()
-            self.move_files_window = None
+            self.mv_window = None
             self.load_directory(self.current_dir)
 
         def browse():
@@ -1153,7 +1284,7 @@ class DatasetTaggerApp:
         btn_f.pack(pady=5)
         tk.Button(btn_f, text=cfg["pm_browse"], command=browse).pack(side=tk.LEFT, padx=5)
         tk.Button(btn_f, text=cfg["pm_move"], command=do_move, bg="#ffcccc").pack(side=tk.LEFT, padx=5)
-        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'move_files_window', None)))
+        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'mv_window', None)))
         return "break"
 
     def rename_file(self, event=None):
@@ -1182,13 +1313,13 @@ class DatasetTaggerApp:
         return "break"
 
     def open_group_manager(self, event=None):
-        if hasattr(self, 'group_manager_window') and self.group_manager_window and self.group_manager_window.winfo_exists():
-            self.group_manager_window.destroy()
-            self.group_manager_window = None
+        if hasattr(self, 'grp_window') and self.grp_window and self.grp_window.winfo_exists():
+            self.grp_window.destroy()
+            self.grp_window = None
             return "break"
 
         cfg = self.i18n[self.current_lang]
-        self.group_manager_window = win = tk.Toplevel(self.root)
+        self.grp_window = win = tk.Toplevel(self.root)
         win.title(cfg["dlg_grp_mgr"])
         win.geometry("480x350")
         win.attributes("-topmost", True)
@@ -1295,17 +1426,17 @@ class DatasetTaggerApp:
         tk.Button(btn_f, text=cfg.get("btn_apply_grp", "Apply w/ Tags"), command=lambda: apply_grp(False), bg="#ccffcc").pack(side=tk.RIGHT, padx=5)
         tk.Button(btn_f, text=cfg.get("btn_apply_grp_only", "Apply Group Only"), command=lambda: apply_grp(True)).pack(side=tk.RIGHT, padx=5)
 
-        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'group_manager_window', None)))
+        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'grp_window', None)))
         return "break"
 
     def open_prompt_manager(self, event=None):
-        if hasattr(self, 'prompt_manager_window') and self.prompt_manager_window and self.prompt_manager_window.winfo_exists():
-            self.prompt_manager_window.destroy()
-            self.prompt_manager_window = None
+        if hasattr(self, 'pm_window') and self.pm_window and self.pm_window.winfo_exists():
+            self.pm_window.destroy()
+            self.pm_window = None
             return "break"
 
         cfg = self.i18n[self.current_lang]
-        self.prompt_manager_window = win = tk.Toplevel(self.root)
+        self.pm_window = win = tk.Toplevel(self.root)
         win.title(cfg["menu_prompt_mgr"])
         win.geometry("550x450")
 
@@ -1366,9 +1497,9 @@ class DatasetTaggerApp:
             self.text_edit.insert("1.0", new_text)
             self.show_toast(cfg["toast_applied"], bg_color="#4CAF50")
             win.destroy()
-            self.prompt_manager_window = None
+            self.pm_window = None
 
-        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'prompt_manager_window', None)))
+        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'pm_window', None)))
 
         f_bot = tk.Frame(win)
         f_bot.pack(fill=tk.X, padx=5, pady=5)
@@ -1393,13 +1524,13 @@ class DatasetTaggerApp:
                 subprocess.Popen(['xdg-open', self.current_dir])
 
     def open_search_file(self, event=None):
-        if hasattr(self, 'filter_search_window') and self.filter_search_window and self.filter_search_window.winfo_exists():
-            self.filter_search_window.destroy()
-            self.filter_search_window = None
+        if hasattr(self, 'fs_window') and self.fs_window and self.fs_window.winfo_exists():
+            self.fs_window.destroy()
+            self.fs_window = None
             return "break"
 
         cfg = self.i18n[self.current_lang]
-        self.filter_search_window = win = tk.Toplevel(self.root)
+        self.fs_window = win = tk.Toplevel(self.root)
         win.title(cfg["search_file"])
         win.attributes("-topmost", True)
         win.geometry("380x150")
@@ -1425,7 +1556,7 @@ class DatasetTaggerApp:
         tk.Button(btn_f, text=cfg["btn_filter"], command=self.apply_filter, bg="#d9edf7").pack(side=tk.LEFT, padx=5)
         tk.Button(btn_f, text=cfg["btn_clear_filter"], command=self.clear_filter).pack(side=tk.LEFT, padx=5)
 
-        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'filter_search_window', None)))
+        win.protocol("WM_DELETE_WINDOW", lambda: (win.destroy(), setattr(self, 'fs_window', None)))
 
         win.update_idletasks()
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - (win.winfo_width() // 2)
@@ -1602,9 +1733,13 @@ class DatasetTaggerApp:
     def advance_to_next(self, current_filename):
         idx = self.display_filenames.index(current_filename) if current_filename in self.display_filenames else -1
         next_file = self.display_filenames[idx + 1] if idx != -1 and (idx + 1) < len(self.display_filenames) else None
+        
         self.refresh_listbox()
+        
         if next_file and next_file in self.display_filenames:
             new_idx = self.display_filenames.index(next_file)
+            # 設定自動跳轉旗標，讓翻譯功能得以觸發
+            self.auto_translate_pending = True
             self.center_tree_item(new_idx, self.tree.get_children()[new_idx])
             self.on_file_select()
 
@@ -1622,12 +1757,19 @@ class DatasetTaggerApp:
                 img = ImageOps.exif_transpose(img)
             except:
                 pass
-            img.thumbnail((700, 700))
-            photo = ImageTk.PhotoImage(img)
-            self.lbl_image.config(image=photo, text="")
-            self.lbl_image.image = photo
+            
+            self.current_pil_image = img
+            self.reset_image_view()
+            
         except:
-            self.lbl_image.config(image='', text=self.i18n[self.current_lang]["img_err"])
+            self.current_pil_image = None
+            self.canvas_image.delete("all")
+            self.canvas_image.create_text(
+                self.canvas_image.winfo_width()/2, 
+                self.canvas_image.winfo_height()/2, 
+                text=self.i18n[self.current_lang]["img_err"], 
+                fill="white"
+            )
 
         self.text_original.config(state=tk.NORMAL)
         self.text_original.delete("1.0", tk.END)
@@ -1641,6 +1783,12 @@ class DatasetTaggerApp:
                 self.text_original.insert("1.0", content)
                 self.text_edit.insert("1.0", content)
         self.text_original.config(state=tk.DISABLED)
+        
+        # 僅在程式自動跳轉 (非滑鼠點擊) 時觸發翻譯
+        if self.var_auto_trans.get() and getattr(self, 'auto_translate_pending', False):
+            self.root.after(50, lambda: self.translate_text(False))
+            
+        self.auto_translate_pending = False
 
     def save_tags(self, event=None):
         selected = self.tree.selection()
